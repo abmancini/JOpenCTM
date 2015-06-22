@@ -222,7 +222,7 @@ public class MG2Encoder extends MG1Encoder {
     /**
      * Re-index all indices, based on the sorted vertices.
      */
-    private int[] reIndexIndices(SortableVertex[] sortVertices, int[] indices) {
+    protected int[] reIndexIndices(SortableVertex[] sortVertices, int[] indices) {
         // Create temporary lookup-array, O(n)
         int[] indexLUT = new int[sortVertices.length];
         int[] newIndices = new int[indices.length];
@@ -243,7 +243,7 @@ public class MG2Encoder extends MG1Encoder {
     /**
      * Calculate various forms of derivatives in order to reduce data entropy.
      */
-    private int[] makeVertexDeltas(float[] vertices, SortableVertex[] sortVertices, Grid grid) {
+    protected int[] makeVertexDeltas(float[] vertices, SortableVertex[] sortVertices, Grid grid) {
         int vc = sortVertices.length;
 
         // Vertex scaling factor
@@ -284,7 +284,7 @@ public class MG2Encoder extends MG1Encoder {
      * Convert the normals to a new coordinate system: magnitude, phi, theta
      * (relative to predicted smooth normals).
      */
-    private int[] makeNormalDeltas(float[] vertices, float[] normals, int[] indices, SortableVertex[] sortVertices) {
+    protected int[] makeNormalDeltas(float[] vertices, float[] normals, int[] indices, SortableVertex[] sortVertices) {
         // Calculate smooth normals (Note: aVertices and aIndices use the sorted
         // index space, so smoothNormals will too)
         float[] smoothNormals = calcSmoothNormals(vertices, indices);
@@ -363,7 +363,7 @@ public class MG2Encoder extends MG1Encoder {
     /**
      * Calculate various forms of derivatives in order to reduce data entropy.
      */
-    private int[] makeUVCoordDeltas(AttributeData map, SortableVertex[] sortVertices) {
+    protected int[] makeUVCoordDeltas(AttributeData map, SortableVertex[] sortVertices) {
         // UV coordinate scaling factor
         float scale = 1.0f / map.precision;
         int vc = sortVertices.length;
@@ -392,7 +392,7 @@ public class MG2Encoder extends MG1Encoder {
     /**
      * Calculate various forms of derivatives in order to reduce data entropy.
      */
-    private int[] makeAttribDeltas(AttributeData map, SortableVertex[] sortVertices) {
+    protected int[] makeAttribDeltas(AttributeData map, SortableVertex[] sortVertices) {
         // Attribute scaling factor
         float scale = 1.0f / map.precision;
 
@@ -411,9 +411,9 @@ public class MG2Encoder extends MG1Encoder {
             // be close to each other (and we assume that they somehow vary slowly with
             // the geometry)...
 
-            for (int j = 0; j < 4; ++j) {
-                int value = (int) floor(scale * map.values[oldIdx * 4 + j] + 0.5f);
-                intAttribs[i * 4 + j] = value - prev[j];
+            for (int j = 0; j < CTM_ATTR_ELEMENT_COUNT; ++j) {
+                int value = (int) floor(scale * map.values[oldIdx * CTM_ATTR_ELEMENT_COUNT + j] + 0.5f);
+                intAttribs[i * CTM_ATTR_ELEMENT_COUNT + j] = value - prev[j];
                 prev[j] = value;
             }
         }
